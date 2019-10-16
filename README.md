@@ -1,2 +1,3 @@
-# Linear-Least-Squares
-Calculate parameters from linear regression of a set of points
+# System Linearizer
+
+Calculate linearization parameters from sets of input and output points
