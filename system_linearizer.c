@@ -1,3 +1,26 @@
+/////////////////////////////////////////////////////////////////////////////////
+//                                                                             //
+//  Copyright (c) 2019 Leonardo Consoni <leonardojc@protonmail.com>            //
+//                                                                             //
+//  This file is part of Simple-System-Linearizer.                             //
+//                                                                             //
+//  Simple-System-Linearizer is free software: you can redistribute it         //
+//  and/or modify it under the terms of the GNU Lesser General Public License  //
+//  as published by the Free Software Foundation, either version 3 of the      //
+//  License, or (at your option) any later version.                            //
+//                                                                             //
+//  Simple-System-Linearizer is distributed in the hope that it will           //
+//  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty     //
+//  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the            //
+//  GNU Lesser General Public License for more details.                        //
+//                                                                             //
+//  You should have received a copy of the GNU Lesser General Public License   //
+//  along with Simple-System-Linearizer.                                       //
+//  If not, see <http://www.gnu.org/licenses/>.                                //
+//                                                                             //
+/////////////////////////////////////////////////////////////////////////////////
+
+
 #include "system_linearizer.h"
 
 #include "matrix/matrix.h"
@@ -13,13 +36,13 @@ struct _LinearSystemData
   size_t samplesCount;
 };
 
-LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t samplesNumber )
+LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t maxSamplesNumber )
 {
   LinearSystem lSystem = (LinearSystem) malloc( sizeof(LinearSystemData) );
   
-  lSystem->inputSamples = Mat_Create( NULL, samplesNumber, inputsNumber );
-  lSystem->outputSamples = Mat_Create( NULL, samplesNumber, outputsNumber );
-  lSystem->aux = Mat_Create( NULL, inputsNumber, samplesNumber );
+  lSystem->inputSamples = Mat_Create( NULL, maxSamplesNumber, inputsNumber );
+  lSystem->outputSamples = Mat_Create( NULL, maxSamplesNumber, outputsNumber );
+  lSystem->aux = Mat_Create( NULL, inputsNumber, maxSamplesNumber );
   lSystem->parameters = Mat_Create( NULL, inputsNumber, outputsNumber );
   lSystem->samplesCount = 0;
   
@@ -45,18 +68,24 @@ size_t SystemLinearizer_AddSample( LinearSystem lSystem, double* inputsList, dou
 
 bool SystemLinearizer_Identify( LinearSystem lSystem, double* parametersList )
 {
-  size_t maxSamplesNumber = Mat_GetHeight( lSystem->inputSamples );
-  
-  if( lSystem->samplesCount < maxSamplesNumber ) return false;
-  
   lSystem->aux = Mat_Dot( lSystem->inputSamples, MATRIX_TRANSPOSE, lSystem->inputSamples, MATRIX_KEEP, lSystem->aux );
   lSystem->aux = Mat_Inverse( lSystem->aux, lSystem->aux );
-  lSystem->aux = Mat_Dot( Mat_Inverse( lSystem->aux, lSystem->aux ), MATRIX_KEEP, lSystem->aux, MATRIX_KEEP, lSystem->aux );
+  if( (lSystem->aux = Mat_Inverse( lSystem->aux, lSystem->aux )) == NULL ) return false;
+  lSystem->aux = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->aux, MATRIX_KEEP, lSystem->aux );
   lSystem->parameters = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->outputSamples, MATRIX_KEEP, lSystem->parameters );
   
   Mat_GetData( lSystem->parameters, parametersList );
   
   return true;
+}
+
+void SystemLinearizer_Reset( LinearSystem lSystem )
+{
+  Mat_Clear( lSystem->inputSamples );
+  Mat_Clear( lSystem->outputSamples );
+  Mat_Clear( lSystem->aux );
+  Mat_Clear( lSystem->parameters );
+  lSystem->samplesCount = 0;
 }
 
 void SystemLinearizer_DeleteSystem( LinearSystem lSystem )

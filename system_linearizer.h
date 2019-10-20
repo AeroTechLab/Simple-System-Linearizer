@@ -20,18 +20,47 @@
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
 
+
+/// @file system_linearizer.h
+/// @brief System Linearizer implementation
+///
+/// Estimate parameters for linear regression of a system using least squares method to solve X*B = Y
+
 #ifndef SYSTEM_LINEARIZER_H
 #define SYSTEM_LINEARIZER_H
 
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef struct _LinearSystemData LinearSystemData;
-typedef LinearSystemData* LinearSystem;
+typedef struct _LinearSystemData LinearSystemData;    ///< Single linear system sampling data structure
+typedef LinearSystemData* LinearSystem;               ///< Opaque reference to linear system data structure
 
-LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t samplesNumber );
+/// @brief Creates and initializes sampling data matrices for linearization
+/// @param[in] inputsNumber number of columns for the X input samples matrix
+/// @param[in] outputsNumber number of columns for the Y output samples matrix
+/// @param[in] maxSamplesNumber max number of rows for X and Y matrices
+/// @return reference to created linear system
+LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t maxSamplesNumber );
+
+/// @brief Add new single input-output sample pair to the sampling matrices 
+/// @param[in] lSystem reference to linear system
+/// @param inputsList array of inputs for the added sample (X matrix row)
+/// @param outputsList array of outputs for the added sample (Y matrix row)
+/// @return total number of added samples (first ones are overwritten once the maximum is reached)
 size_t SystemLinearizer_AddSample( LinearSystem lSystem, double* inputsList, double* outputsList );
+
+/// @brief Estimate linearization parameters from the previously provided data samples
+/// @param[in] lSystem reference to linear system
+/// @param[out] parametersList array to store estimated linearization parameters (size of nº inputs x nº outputs)
+/// @return true on successful calculation, false otherwise
 bool SystemLinearizer_Identify( LinearSystem lSystem, double* parametersList );
+
+/// @brief Clear/zero out the internally stored data samples
+/// @param[in] lSystem reference to linear system
+void SystemLinearizer_Reset( LinearSystem lSystem );
+
+/// @brief Deallocates memory for internal linearizer data
+/// @param[in] lSystem reference to linear system
 void SystemLinearizer_DeleteSystem( LinearSystem lSystem );
 
 
