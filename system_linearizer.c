@@ -36,13 +36,16 @@ struct _LinearSystemData
   size_t samplesCount;
 };
 
-LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t maxSamplesNumber )
+LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t samplesNumber )
 {
+  if( inputsNumber > MAX_VARIABLES_NUMBER || outputsNumber > MAX_VARIABLES_NUMBER ) return NULL;
+  if( samplesNumber > MAX_SAMPLES_NUMBER ) return NULL;
+  
   LinearSystem lSystem = (LinearSystem) malloc( sizeof(LinearSystemData) );
   
-  lSystem->inputSamples = Mat_Create( NULL, maxSamplesNumber, inputsNumber );
-  lSystem->outputSamples = Mat_Create( NULL, maxSamplesNumber, outputsNumber );
-  lSystem->aux = Mat_Create( NULL, inputsNumber, maxSamplesNumber );
+  lSystem->inputSamples = Mat_Create( NULL, samplesNumber, inputsNumber );
+  lSystem->outputSamples = Mat_Create( NULL, samplesNumber, outputsNumber );
+  lSystem->aux = Mat_Create( NULL, inputsNumber, samplesNumber );
   lSystem->parameters = Mat_Create( NULL, inputsNumber, outputsNumber );
   lSystem->samplesCount = 0;
   
@@ -51,11 +54,11 @@ LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsN
 
 size_t SystemLinearizer_AddSample( LinearSystem lSystem, double* inputsList, double* outputsList )
 {
-  size_t maxSamplesNumber = Mat_GetHeight( lSystem->inputSamples );
+  size_t samplesNumber = Mat_GetHeight( lSystem->inputSamples );
   size_t inputsNumber = Mat_GetWidth( lSystem->inputSamples );
   size_t outputsNumber = Mat_GetWidth( lSystem->outputSamples );
   
-  size_t sampleIndex = ( lSystem->samplesCount++ ) % maxSamplesNumber;
+  size_t sampleIndex = ( lSystem->samplesCount++ ) % samplesNumber;
   
   for( size_t inputIndex = 0; inputIndex < inputsNumber; inputIndex++ )
     Mat_SetElement( lSystem->inputSamples, sampleIndex, inputIndex, inputsList[ inputIndex ] );
