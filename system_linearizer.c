@@ -38,8 +38,8 @@ struct _LinearSystemData
 
 LinearSystem SystemLinearizer_CreateSystem( size_t inputsNumber, size_t outputsNumber, size_t samplesNumber )
 {
-  if( inputsNumber > MAX_VARIABLES_NUMBER || outputsNumber > MAX_VARIABLES_NUMBER ) return NULL;
-  if( samplesNumber > MAX_SAMPLES_NUMBER ) return NULL;
+  if( inputsNumber > LINEARIZATION_MAX_VARIABLES || outputsNumber > LINEARIZATION_MAX_VARIABLES ) return NULL;
+  if( samplesNumber > LINEARIZATION_MAX_SAMPLES ) return NULL;
   
   LinearSystem lSystem = (LinearSystem) malloc( sizeof(LinearSystemData) );
   

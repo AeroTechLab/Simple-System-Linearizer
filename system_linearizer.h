@@ -32,8 +32,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#define MAX_VARIABLES_NUMBER 10		              ///< Maximum number of inputs, outputs or linearization coefficients
-#define MAX_SAMPLES_NUMBER 100			      ///< Maximum number of samples for linear regression
+#define LINEARIZATION_MAX_VARIABLES 10		      ///< Maximum number of inputs, outputs or linearization coefficients
+#define LINEARIZATION_MAX_SAMPLES 100		      ///< Maximum number of samples for linear regression
 
 typedef struct _LinearSystemData LinearSystemData;    ///< Single linear system sampling data structure
 typedef LinearSystemData* LinearSystem;               ///< Opaque reference to linear system data structure
