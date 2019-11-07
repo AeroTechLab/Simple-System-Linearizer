@@ -72,8 +72,7 @@ size_t SystemLinearizer_AddSample( LinearSystem lSystem, double* inputsList, dou
 bool SystemLinearizer_Identify( LinearSystem lSystem, double* parametersList )
 {
   lSystem->aux = Mat_Dot( lSystem->inputSamples, MATRIX_TRANSPOSE, lSystem->inputSamples, MATRIX_KEEP, lSystem->aux );
-  lSystem->aux = Mat_Inverse( lSystem->aux, lSystem->aux );
-  if( (lSystem->aux = Mat_Inverse( lSystem->aux, lSystem->aux )) == NULL ) return false;
+  if( Mat_Inverse( lSystem->aux, lSystem->aux ) == NULL ) return false;
   lSystem->aux = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->aux, MATRIX_KEEP, lSystem->aux );
   lSystem->parameters = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->outputSamples, MATRIX_KEEP, lSystem->parameters );
   
