@@ -16,3 +16,6 @@ set_target_properties( SystemLinearizer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${LI
 target_include_directories( SystemLinearizer PUBLIC ${CMAKE_CURRENT_LIST_DIR} )
 target_compile_definitions( SystemLinearizer PUBLIC -DDEBUG )
 target_link_libraries( SystemLinearizer Matrix ) 
+
+add_executable( TestLinearizer ${CMAKE_CURRENT_LIST_DIR}/test_linearizer.c )
+target_link_libraries( TestLinearizer SystemLinearizer )

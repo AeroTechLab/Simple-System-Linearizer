@@ -26,6 +26,7 @@
 #include "matrix/matrix.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 struct _LinearSystemData
 {
@@ -71,13 +72,11 @@ size_t SystemLinearizer_AddSample( LinearSystem lSystem, double* inputsList, dou
 
 bool SystemLinearizer_Identify( LinearSystem lSystem, double* parametersList )
 {
-  lSystem->aux = Mat_Dot( lSystem->inputSamples, MATRIX_TRANSPOSE, lSystem->inputSamples, MATRIX_KEEP, lSystem->aux );
+  Mat_Dot( lSystem->inputSamples, MATRIX_TRANSPOSE, lSystem->inputSamples, MATRIX_KEEP, lSystem->aux );
   if( Mat_Inverse( lSystem->aux, lSystem->aux ) == NULL ) return false;
-  lSystem->aux = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->aux, MATRIX_KEEP, lSystem->aux );
-  lSystem->parameters = Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->outputSamples, MATRIX_KEEP, lSystem->parameters );
-  
+  Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->inputSamples, MATRIX_TRANSPOSE, lSystem->aux );
+  Mat_Dot( lSystem->aux, MATRIX_KEEP, lSystem->outputSamples, MATRIX_KEEP, lSystem->parameters );
   Mat_GetData( lSystem->parameters, parametersList );
-  
   return true;
 }
 
