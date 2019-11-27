@@ -6,8 +6,7 @@ set( CMAKE_C_STANDARD_REQUIRED ON )
 
 set( LIBRARY_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE PATH "Relative or absolute path to directory where built shared libraries will be placed" )
 
-find_library( has_matrix Matrix PATHS ${LIBRARY_DIR} )
-if( NOT has_matrix )
+if( NOT TARGET Matrix )
   include( ${CMAKE_CURRENT_LIST_DIR}/matrix/CMakeLists.txt )
 endif()
 
